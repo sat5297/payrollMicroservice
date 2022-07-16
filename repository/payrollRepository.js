@@ -4,8 +4,7 @@ if(process.env.NODE_ENV !== 'production'){
 const mongoose = require('mongoose');
 const nodemailer = require('nodemailer');
 const { MongoClient, ServerApiVersion } = require('mongodb');
-const { resolve, reject } = require('promise');
-const req = require('express/lib/request');
+const Payroll = require('../models/payrollModel');
 
 const client = new MongoClient(process.env.DATABASE_URL, {
     useNewUrlParser: true, useUnifiedTopology: true 
@@ -39,7 +38,7 @@ const issuePayCheck = async(body) => {
     }
     return new Promise((resolve,reject) => {
         client.connect(async err => {
-            const payrollCollection = client.db("employee").collection("payroll");
+            const payrollCollection = client.db("payroll").collection("payroll");
             try{
                     await payrollCollection.findOneAndUpdate(searchOptions, {$set : {status : body.status}} , {new: true, upsert: true}).then((res) => {
                         paySalary(body.empID);
@@ -56,7 +55,7 @@ const issuePayCheck = async(body) => {
 const paySalary = (empID) => {
     console.log(empID);
     client.connect(async err => {
-        const salaryCollection = client.db("employee").collection("salary");
+        const salaryCollection = client.db("payroll").collection("payroll");
         try{
             const totalSalary = await salaryCollection.find({empID}).toArray();
             console.log(totalSalary);
@@ -87,7 +86,7 @@ const allEmp = async(body) => {
     }
     return new Promise((resolve,reject) => {
         client.connect(async err => {
-            const payrollCollection = client.db("employee").collection("payroll");
+            const payrollCollection = client.db("payroll").collection("payroll");
             try{
                     const emp = await payrollCollection.find(searchOptions).toArray();
                     resolve(emp);
@@ -97,9 +96,86 @@ const allEmp = async(body) => {
             }
         });
     });
-}
+};
+
+const addEmp = async(body) => {
+    const payroll = new Payroll(body);
+    console.log(body, payroll);
+    return new Promise((resolve,reject) => {
+        client.connect(async err => {
+            const payrollCollection = client.db("payroll").collection("payroll");
+            try{
+                await payrollCollection.insertOne(body).then((res)=>{
+                    if(res.acknowledged){
+                        resolve("Inserted Successfully.");
+                    }else{
+                        resolve("Insertion Unsuccessfully.");
+                    }
+                });
+            }
+            catch{
+                    reject("Error in promise");
+            }
+        });
+    });
+};
+
+const updateEmp = async (body) => {
+    console.log(body);
+    const payroll = new Payroll(body);
+    let searchOptions = {};
+    if(body.empID != null && body.empID !== ""){
+        searchOptions.empID = body.empID;
+    }
+    // if(body.mail != null && body.mail !== ""){
+    //     searchOptions.mail = body.mail;
+    // }
+    console.log(body, searchOptions, payroll);
+    return new Promise((resolve,reject) => {
+        client.connect(async err => {
+            const payrollCollection = client.db("payroll").collection("payroll");
+            try{
+                await payrollCollection.findOneAndUpdate(searchOptions, {$set : {"mail" : payroll.mail}}).then((res) => {
+                    console.log(res);
+                    resolve("Updated in Payroll Database.");
+                });
+            }
+            catch{
+                reject("Unable to update in Payroll Databse.");
+            }
+        });
+    });
+};
+
+const deleteEmp = async (body) => {
+    let searchOptions = {};
+    if(body.empID != null && body.empID !== ""){
+        searchOptions.empID = body.empID;
+    }
+    console.log(body,searchOptions);
+    return new Promise((resolve,reject) => {
+        client.connect(async err => {
+            const payrollCollection = client.db("payroll").collection("payroll");
+            try{
+                await payrollCollection.deleteOne(searchOptions).then((res) => {
+                    if(res.acknowledged){
+                        resolve("Deleted the Employee from Payroll Database");
+                    }else{
+                        resolve("Unable to delete the Employee from Payroll Database");
+                    }
+                });
+            }
+            catch{
+                reject("Error in Promise");
+            }
+        });
+    });
+};
 
 module.exports = {
     issuePayCheck,
-    allEmp
+    allEmp,
+    addEmp,
+    deleteEmp,
+    updateEmp
 };
