@@ -5,7 +5,7 @@ const payrollSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    mail : {
+    empMail : {
         type : String,
         required : true
     }

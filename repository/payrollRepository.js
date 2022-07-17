@@ -105,9 +105,10 @@ const addEmp = async(body) => {
         client.connect(async err => {
             const payrollCollection = client.db("payroll").collection("payroll");
             try{
-                await payrollCollection.insertOne(body).then((res)=>{
+                await payrollCollection.insertOne(payroll).then((res)=>{
+                    console.log(res);
                     if(res.acknowledged){
-                        resolve("Inserted Successfully.");
+                        resolve("Employee inserted successfully in Payroll Database.");
                     }else{
                         resolve("Insertion Unsuccessfully.");
                     }
@@ -135,7 +136,7 @@ const updateEmp = async (body) => {
         client.connect(async err => {
             const payrollCollection = client.db("payroll").collection("payroll");
             try{
-                await payrollCollection.findOneAndUpdate(searchOptions, {$set : {"mail" : payroll.mail}}).then((res) => {
+                await payrollCollection.findOneAndUpdate(searchOptions, {$set : {"mail" : payroll.empMail}}).then((res) => {
                     console.log(res);
                     resolve("Updated in Payroll Database.");
                 });
