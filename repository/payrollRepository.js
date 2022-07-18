@@ -23,6 +23,7 @@ let transporter = nodemailer.createTransport({
   });
 
 const issuePayCheck = async(body) => {
+    const payroll = new Payroll(body);
     let searchOptions = {};
     if(body.empID != null && body.empID !== ""){
         searchOptions.empID = body.empID;
@@ -36,11 +37,12 @@ const issuePayCheck = async(body) => {
     if(body.empManager != null && body.empManager !== ""){
         searchOptions.empManager = body.empManager;
     }
+    console.log(payroll, searchOptions,"issue paycheck");
     return new Promise((resolve,reject) => {
         client.connect(async err => {
             const payrollCollection = client.db("payroll").collection("payroll");
             try{
-                    await payrollCollection.findOneAndUpdate(searchOptions, {$set : {status : body.status}} , {new: true, upsert: true}).then((res) => {
+                    await payrollCollection.findOneAndUpdate(searchOptions, {$set : {"empPayStatus" : payroll.empPayStatus}} , {new: true, upsert: true}).then((res) => {
                         paySalary(body.empID);
                         resolve("Updated Status Successfully");
                     });
@@ -84,15 +86,16 @@ const allEmp = async(body) => {
     if(body.empManagerID != null && body.empManagerID !== ""){
         searchOptions.empManagerID = body.empManagerID;
     }
+    console.log(searchOptions, body);
     return new Promise((resolve,reject) => {
         client.connect(async err => {
             const payrollCollection = client.db("payroll").collection("payroll");
             try{
-                    const emp = await payrollCollection.find(searchOptions).toArray();
-                    resolve(emp);
+                const emp = await payrollCollection.find(searchOptions).toArray();
+                resolve(emp);
             }
             catch{
-                    reject("Error in promise");
+                reject("Error in promise");
             }
         });
     });
@@ -100,7 +103,7 @@ const allEmp = async(body) => {
 
 const addEmp = async(body) => {
     const payroll = new Payroll(body);
-    console.log(body, payroll);
+    console.log(body, payroll,"Add");
     return new Promise((resolve,reject) => {
         client.connect(async err => {
             const payrollCollection = client.db("payroll").collection("payroll");
@@ -149,6 +152,7 @@ const updateEmp = async (body) => {
 };
 
 const deleteEmp = async (body) => {
+    const payroll = new Payroll(body);
     let searchOptions = {};
     if(body.empID != null && body.empID !== ""){
         searchOptions.empID = body.empID;
@@ -158,6 +162,7 @@ const deleteEmp = async (body) => {
         client.connect(async err => {
             const payrollCollection = client.db("payroll").collection("payroll");
             try{
+                await updateManager(payroll);
                 await payrollCollection.deleteOne(searchOptions).then((res) => {
                     if(res.acknowledged){
                         resolve("Deleted the Employee from Payroll Database");
@@ -165,6 +170,28 @@ const deleteEmp = async (body) => {
                         resolve("Unable to delete the Employee from Payroll Database");
                     }
                 });
+            }
+            catch{
+                reject("Error in Promise");
+            }
+        });
+    });
+};
+
+const updateManager = async (payroll) => {
+    let searchOptions = {};
+    if(payroll.empID != null && payroll.empID !== ""){
+        searchOptions.empManagerID = payroll.empID;
+    }
+    return new Promise((resolve,reject) => {
+        client.connect(async err => {
+            const payrollCollection = client.db("payroll").collection("payroll");
+            try{
+                await payrollCollection.updateMany(searchOptions, 
+                    {$set : {empManagerID : payroll.empManagerID, empManager : payroll.empManager }}).then((res) => {
+                        console.log(res);
+                        resolve("Updated the Manager in Payroll Database");
+                })
             }
             catch{
                 reject("Error in Promise");
