@@ -139,7 +139,7 @@ const updateEmp = async (body) => {
         client.connect(async err => {
             const payrollCollection = client.db("payroll").collection("payroll");
             try{
-                await payrollCollection.findOneAndUpdate(searchOptions, {$set : {"mail" : payroll.empMail}}).then((res) => {
+                await payrollCollection.findOneAndUpdate(searchOptions, {$set : {"empMail" : payroll.empMail}}).then((res) => {
                     console.log(res);
                     resolve("Updated in Payroll Database.");
                 });
