@@ -2,3 +2,12 @@
 
 This is the Payroll Microservice, part of the Employee Management System.
 This service is used to issue paychecks to the Employees and drops mail to them with the information.
+
+It includes the following functionalities:
+  <ul>
+  <li>The manager can list the employees under him to issue paycheck.</li>
+  <li>The manager can issue paychecks to the employees under him.</li>
+  <li>The employees receives mail with the details after paycheck is issued.</li>
+  </ul>
+
+<a href="https://documenter.getpostman.com/view/10075006/UzQyq3pb" > <h4> API Documentation </h4> </a>
