@@ -10,7 +10,9 @@ It includes the following functionalities:
   <li>The employees receives mail with the details after paycheck is issued.</li>
   </ul>
 
+
+<a href="https://documenter.getpostman.com/view/10075006/UzQyq3pb" > <h2> API Documentation </h2> </a>
+
 # Payroll Activity
 <img src="https://github.com/sat5297/payrollMicroservice/blob/master/PayrollActivity.jpeg" alt="Payroll Activity" />
 
-<a href="https://documenter.getpostman.com/view/10075006/UzQyq3pb" > <h4> API Documentation </h4> </a>
