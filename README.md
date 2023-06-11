@@ -11,7 +11,7 @@ It includes the following functionalities:
   </ul>
 
 
-<a href="https://documenter.getpostman.com/view/10075006/UzQyq3pb" > <h2> API Documentation </h2> </a>
+ <h2> <a href="https://documenter.getpostman.com/view/10075006/UzQyq3pb" > API Documentation </a> </h2> 
 
 # Payroll Activity
 <img src="https://github.com/sat5297/payrollMicroservice/blob/master/PayrollActivity.jpeg" alt="Payroll Activity" />
